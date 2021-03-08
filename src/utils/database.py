@@ -5,6 +5,7 @@ from loguru import logger
 from json import dumps, loads
 from discord import Message as Msg
 from collections import namedtuple
+from datetime import datetime
 
 Guild = namedtuple("Guild", ["id", "config", "created_at"])
 User = namedtuple("User", ["id", "permissions", "banned", "created_at"])
@@ -94,6 +95,8 @@ class Database:
     async def create_user(self, user_id: int):
         await self.execute("INSERT INTO Users (id) VALUES ($1);", user_id)
         self.users.pop(user_id, None)  # Shouldn't be needed, but I want to make sure
+
+        return User(user_id, 0, False, datetime.utcnow())
 
     async def update_user_permissions(self, user_id: int, level: int):
         await self.execute("UPDATE Users SET permissions = $2 WHERE id = $1;", user_id, level)
