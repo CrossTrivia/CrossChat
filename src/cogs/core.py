@@ -49,11 +49,11 @@ class Core(commands.Cog):
 
         logger.info(f"Successfully sent message to {channel.id} [BCID: {bcid}]")
 
-    async def broadcast(self, message: Message, channel: str, **kwargs):
+    async def broadcast(self, msgid: int, channel: str, **kwargs):
         channels = self.channels.get(channel, [])
 
         for cid in channels:
-            self.bot.loop.create_task(self._send(message.id, self.bot.get_channel(cid), **kwargs))
+            self.bot.loop.create_task(self._send(msgid, self.bot.get_channel(cid), **kwargs))
 
 
 def setup(bot: Bot):
