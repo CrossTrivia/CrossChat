@@ -12,17 +12,16 @@ class Core(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-        self.channel_mapping = {}
-        self.channels = defaultdict(set)
-
         self.redis = RedisCache(namespace="crosschat")
 
         self.bot.loop.run_until_complete(self.setup())
 
     async def setup(self):
         """Set up the bot ready for execution."""
-
         logger.info("Setting up core...")
+
+        self.channel_mapping = {}
+        self.channels = defaultdict(set)
 
         guilds = await self.bot.db.get_all_guilds()
         for guild in guilds:
