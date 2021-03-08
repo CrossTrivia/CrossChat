@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord import Intents
 from aiohttp import ClientSession
-from async_rediscache import RedisSession
 from typing import Optional
 from dotenv import load_dotenv
 from loguru import logger
@@ -30,7 +29,6 @@ class Bot(commands.Bot):
         )
 
         self.http_session: Optional[ClientSession] = None
-        self.redis_session: Optional[RedisSession] = None
         self.db = Database()
 
     def load_extensions(self, *exts):
@@ -49,11 +47,6 @@ class Bot(commands.Bot):
         logger.info("Logging in to Discord...")
 
         self.http_session = ClientSession()
-
-        logger.info("Creating redis session...")
-        self.redis_session = RedisSession(address=getenv("REDIS_ADDR", "redis://localhost"))
-        await self.redis_session.connect()
-        logger.info("Redis session connected.")
 
         await super().login(*args, **kwargs)
 

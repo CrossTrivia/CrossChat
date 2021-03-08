@@ -10,7 +10,6 @@ python = "^3.8"
 python-dotenv = "^0.15.0"
 jishaku = "^1.20.0"
 asyncpg = "^0.22.0"
-async-rediscache = "^0.2.0"
 loguru = "^0.5.3"
 text-normalize = "^1.0.1"
 

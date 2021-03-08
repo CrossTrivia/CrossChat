@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord import Message, TextChannel, Embed, RawMessageDeleteEvent
 from collections import defaultdict
-from async_rediscache import RedisCache
 from loguru import logger
 
 from src.internal.bot import Bot
@@ -14,7 +13,6 @@ class Core(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-        self.redis = RedisCache(namespace="crosschat")
         self.filters = {}
 
         self.bot.loop.run_until_complete(self.setup())
