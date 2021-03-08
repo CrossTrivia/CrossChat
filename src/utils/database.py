@@ -84,7 +84,7 @@ class Database:
         return user
 
     async def create_user(self, user_id: int):
-        await self.execute("INSERT INTO Users (id, messages) VALUES ($1, 1);", user_id)
+        await self.execute("INSERT INTO Users (id) VALUES ($1);", user_id)
         self.users.pop(user_id, None)  # Shouldn't be needed, but I want to make sure
 
     async def update_user_permissions(self, user_id: int, level: int):
