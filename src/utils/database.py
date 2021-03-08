@@ -2,7 +2,11 @@ from asyncio import get_event_loop
 from asyncpg import create_pool
 from os import getenv
 from loguru import logger
-from json import dumps
+from json import dumps, loads
+from collections import namedtuple
+
+Guild = namedtuple("Guild", ["id", "config", "created_at"])
+User = namedtuple("User", ["id", "permissions", "banned", "created_at"])
 
 
 class Database:
@@ -44,8 +48,14 @@ class Database:
             return self.guilds[guild_id]
 
         data = await self.fetchrow("SELECT * FROM Guilds WHERE id = $1;", guild_id)
-        self.guilds[guild_id] = data
-        return data
+
+        if not data:
+            return None
+
+        guild = Guild(data["id"], loads(data["config"]), data["created_at"])
+        self.guilds[guild_id] = guild
+
+        return guild
 
     async def create_guild(self, guild_id: int, config: dict = {}):
         await self.execute("INSERT INTO Guilds (id, config) VALUES ($1, $2);", guild_id, dumps(config))
@@ -64,8 +74,14 @@ class Database:
             return self.users[user_id]
 
         data = await self.fetchrow("SELECT * FROM Users WHERE id = $1;", user_id)
-        self.users[user_id] = data
-        return data
+
+        if not data:
+            return None
+
+        user = User(data["id"], data["permissions"], data["banned"], data["created_at"])
+        self.users[user_id] = user
+
+        return user
 
     async def create_user(self, user_id: int):
         await self.execute("INSERT INTO Users (id, messages) VALUES ($1, 1);", user_id)
