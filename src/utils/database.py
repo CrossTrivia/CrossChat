@@ -68,7 +68,13 @@ class Database:
         self.guilds.pop(guild_id, None)  # Clear the cache
 
     async def get_all_guilds(self):
-        return await self.fetch("SELECT * FROM Guilds;")
+        guilds = await self.fetch("SELECT * FROM Guilds;")
+
+        gs = []
+        for data in guilds:
+            gs.append(Guild(data["id"], loads(data["config"]), data["created_at"]))
+
+        return gs
 
     # User coros
     async def get_user(self, user_id: int):
@@ -119,7 +125,9 @@ class Database:
     async def get_messages(self, bcid: int):
         messages = await self.fetch("SELECT * FROM Messages WHERE bcid = $1;", bcid)
 
+        ms = []
         for data in messages:
-            yield Message(
+            ms.append(Message(
                 data["id"], data["bcid"], data["guild_id"], data["channel_id"], data["author_id"], data["content"], data["deleted"]
-            )
+            ))
+        return ms
