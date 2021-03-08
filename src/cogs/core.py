@@ -95,9 +95,6 @@ class Core(commands.Cog):
     async def _siblings(self, id: int):
         message = await self.bot.db.get_message(id)
 
-        if (not message) or message.id == message.bcid:
-            return []
-
         return (await self.bot.db.get_messages(message.bcid)) or []
 
     async def _msginfo(self, id: int) -> Embed:
@@ -144,6 +141,19 @@ class Core(commands.Cog):
         await self.bot.db.create_message(message, bcid)
 
         logger.info(f"Successfully sent message to {channel.id} [BCID: {bcid}]")
+
+    async def _edit(self, channel: int, message: int, **kwargs):
+        channel = self.bot.get_channel(channel)
+        message = await channel.fetch_message(message)
+
+        await message.edit(**kwargs)
+
+    async def massedit(self, bcid: int, **kwargs):
+        siblings = await self._siblings(bcid)
+
+        for sibling in siblings:
+            if sibling.id != bcid:
+                self.bot.loop.create_task(self._edit(sibling.channel_id, sibling.id, **kwargs))
 
     async def broadcast(self, msgid: int, channel: str, **kwargs):
         channels = self.channels.get(channel, [])
