@@ -188,6 +188,9 @@ class Core(commands.Cog):
             if not message:
                 return
 
+            if message.id == message.bcid:
+                return
+
             await self.massedit(payload.message_id, exclude=payload.message_id, content="Message deleted.", embed=None)
 
     @commands.command(name="info")
