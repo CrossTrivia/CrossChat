@@ -6,6 +6,7 @@ bot = Bot()
 
 bot.load_extensions(
     "jishaku",
+    "src.cogs.core",
 )
 
 bot.run(getenv("TOKEN"))
