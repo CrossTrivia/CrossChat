@@ -3,10 +3,12 @@ from asyncpg import create_pool
 from os import getenv
 from loguru import logger
 from json import dumps, loads
+from discord import Message as Msg
 from collections import namedtuple
 
 Guild = namedtuple("Guild", ["id", "config", "created_at"])
 User = namedtuple("User", ["id", "permissions", "banned", "created_at"])
+Message = namedtuple("Message", ["id", "bcid", "guild_id", "channel_id", "author_id", "content", "deleted"])
 
 
 class Database:
@@ -90,3 +92,34 @@ class Database:
     async def update_user_permissions(self, user_id: int, level: int):
         await self.execute("UPDATE Users SET permissions = $2 WHERE id = $1;", user_id, level)
         self.users.pop(user_id, None)  # Clear the cache
+
+    # Message coros
+    async def create_message(self, message: Msg, bcid: int):
+        id = message.id
+        guild_id = message.guild.id
+        channel_id = message.channel.id
+        author_id = message.author.id
+        content = message.content
+
+        await self.execute(
+            "INSERT INTO Messages (id, bcid, guild_id, channel_id, author_id, content) VALUES ($1, $2, $3, $4, $5, $6);",
+            id, bcid, guild_id, channel_id, author_id, content,
+        )
+
+    async def get_message(self, id: int):
+        data = await self.fetchrow("SELECT * FROM Messages WHERE id = $1;", id)
+
+        if not data:
+            return None
+
+        return Message(
+            data["id"], data["bcid"], data["guild_id"], data["channel_id"], data["author_id"], data["content"], data["deleted"]
+        )
+
+    async def get_messages(self, bcid: int):
+        messages = await self.fetch("SELECT * FROM Messages WHERE bcid = $1;", bcid)
+
+        for data in messages:
+            yield Message(
+                data["id"], data["bcid"], data["guild_id"], data["channel_id"], data["author_id"], data["content"], data["deleted"]
+            )
