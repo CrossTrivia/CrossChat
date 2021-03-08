@@ -56,3 +56,8 @@ class Bot(commands.Bot):
         logger.info("Redis session connected.")
 
         await super().login(*args, **kwargs)
+
+    async def log(self, embed):
+        channel = self.get_channel(int(getenv("LOGS")))
+
+        await channel.send(embed=embed)
