@@ -92,6 +92,41 @@ class Core(commands.Cog):
 
         logger.info("Core setup complete.")
 
+    async def _siblings(self, id: int):
+        message = await self.bot.db.get_message(id)
+
+        if (not message) or message.id == message.bcid:
+            return []
+
+        return (await self.bot.db.get_messages(message.bcid)) or []
+
+    async def _msginfo(self, id: int) -> Embed:
+        message = await self.bot.db.get_message(id)
+
+        if (not message) or message.id == message.bcid:
+            return Embed(description="No message found with that ID")
+
+        siblings = await self.bot.db.get_messages(message.bcid)
+        original = await self.bot.db.get_message(message.bcid)
+
+        embed = Embed(
+            title=f"Message Info - {id}",
+            colour=0x87CEEB,
+            description="",
+        )
+
+        guild = self.bot.get_guild(original.guild_id)
+        channel = self.bot.get_channel(original.channel_id)
+        author = self.bot.get_user(original.author_id)
+
+        embed.description += f"Parent ID: {original.id}\n"
+        embed.description += f"Siblings: {', '.join([str(m.id) for m in siblings if m.id not in (original.id, id)])}\n"
+        embed.description += f"Guild: {original.guild_id} ({guild})\n"
+        embed.description += f"Channel: {original.channel_id} ({channel})\n"
+        embed.description += f"Author: {original.author_id} ({author})"
+
+        return embed
+
     async def _reject(self, message: Message, reason: str, delete_after: int = 10, dm: bool = False):
         await message.delete(delay=delete_after)
         if dm:
@@ -133,6 +168,13 @@ class Core(commands.Cog):
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed)
         await message.delete()
+
+    @commands.command(name="info")
+    @commands.check_any(commands.is_owner(), commands.has_permissions(manage_messages=True))
+    async def info(self, ctx: commands.Context, message: int):
+        """Get info about a message."""
+
+        await ctx.reply(embed=await self._msginfo(message))
 
 
 def setup(bot: Bot):
