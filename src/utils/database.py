@@ -85,7 +85,7 @@ class Database:
         data = await self.fetchrow("SELECT * FROM Users WHERE id = $1;", user_id)
 
         if not data:
-            return None
+            return await self.create_user(user_id)
 
         user = User(data["id"], data["permissions"], data["banned"], data["created_at"])
         self.users[user_id] = user
