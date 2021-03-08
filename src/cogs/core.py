@@ -5,6 +5,7 @@ from async_rediscache import RedisCache
 from loguru import logger
 
 from src.internal.bot import Bot
+from src.utils.filter import MessageFilter
 
 
 class Core(commands.Cog):
@@ -14,8 +15,12 @@ class Core(commands.Cog):
         self.bot = bot
 
         self.redis = RedisCache(namespace="crosschat")
+        self.filters = {}
 
         self.bot.loop.run_until_complete(self.setup())
+
+    def init_filter(self, guild_id: int, words: list):
+        self.filters[guild_id] = MessageFilter(words)
 
     async def setup(self):
         """Set up the bot ready for execution."""
@@ -32,6 +37,8 @@ class Core(commands.Cog):
                 local = int(local)
                 self.channel_mapping[local] = glob
                 self.channels[glob].add(local)
+
+            self.init_filter(guild.id, guild.config.get("words", []))
 
         logger.info("Core setup complete.")
 
