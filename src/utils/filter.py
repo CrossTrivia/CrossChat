@@ -1,5 +1,4 @@
 from normalize import normalize
-from typing import Tuple
 from collections import namedtuple
 
 Result = namedtuple("Result", ["message", "changed"])
