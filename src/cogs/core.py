@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import Message, TextChannel, Embed
+from discord import Message, TextChannel, Embed, RawMessageDeleteEvent
 from collections import defaultdict
 from async_rediscache import RedisCache
 from loguru import logger
@@ -147,12 +147,13 @@ class Core(commands.Cog):
         message = await channel.fetch_message(message)
 
         await message.edit(**kwargs)
+        logger.info(f"Successfully edited message {message.id} in {channel.id}")
 
-    async def massedit(self, bcid: int, **kwargs):
+    async def massedit(self, bcid: int, exclude: int = 0, **kwargs):
         siblings = await self._siblings(bcid)
 
         for sibling in siblings:
-            if sibling.id != bcid:
+            if sibling.id != bcid and sibling.id != exclude and sibling.id != sibling.bcid:
                 self.bot.loop.create_task(self._edit(sibling.channel_id, sibling.id, **kwargs))
 
     async def broadcast(self, msgid: int, channel: str, **kwargs):
@@ -178,6 +179,16 @@ class Core(commands.Cog):
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed)
         await message.delete()
+
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload: RawMessageDeleteEvent):
+        if payload.channel_id in self.channel_mapping:
+            message = await self.bot.db.get_message(payload.message_id)
+
+            if not message:
+                return
+
+            await self.massedit(payload.message_id, exclude=payload.message_id, content="Message deleted.", embed=None)
 
     @commands.command(name="info")
     @commands.check_any(commands.is_owner(), commands.has_permissions(manage_messages=True))
