@@ -22,9 +22,11 @@ class Core(commands.Cog):
         if level < 10:
             return "", "User"
         elif level < 100:
-            return "🔧", "Server Staff"
+            return "🔨", "Server Staff"
+        elif level < 1000:
+            return "🔨 🛠️", "Global Admin"
         else:
-            return "🛠️", "Global Admin"
+            return "🔨 🛠️ ⚙️", "Developer"
 
     @staticmethod
     def censor_embed(embed: Embed, filter: MessageFilter) -> Embed:
