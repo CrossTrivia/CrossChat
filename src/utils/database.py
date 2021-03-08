@@ -53,7 +53,7 @@ class Database:
         data = await self.fetchrow("SELECT * FROM Guilds WHERE id = $1;", guild_id)
 
         if not data:
-            return None
+            return await self.create_guild(guild_id)
 
         guild = Guild(data["id"], loads(data["config"]), data["created_at"])
         self.guilds[guild_id] = guild
@@ -63,6 +63,8 @@ class Database:
     async def create_guild(self, guild_id: int, config: dict = {}):
         await self.execute("INSERT INTO Guilds (id, config) VALUES ($1, $2);", guild_id, dumps(config))
         self.guilds.pop(guild_id, None)  # Shouldn't be needed, but I want to make sure
+
+        return Guild(guild_id, config, datetime.utcnow())
 
     async def update_guild(self, guild_id: int, config: dict):
         await self.execute("UPDATE Guilds SET config = $2 WHERE id = $1;", guild_id, dumps(config))
