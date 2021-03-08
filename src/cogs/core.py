@@ -39,8 +39,8 @@ class Core(commands.Cog):
     def create_embed(message: Message, badge: str) -> Embed:
         tcr = 0
         for role in message.author.roles:
-            if role.colour:
-                tcr = role.colour
+            if role.colour.value:
+                tcr = role.colour.value
 
         embed = Embed(
             description=message.content,
@@ -116,11 +116,14 @@ class Core(commands.Cog):
         channel = self.bot.get_channel(original.channel_id)
         author = self.bot.get_user(original.author_id)
 
+        user = await self.bot.db.get_user(original.author_id)
+        _, rank = self.get_badge(user.permissions)
+
         embed.description += f"Parent ID: {original.id}\n"
         embed.description += f"Siblings: {', '.join([str(m.id) for m in siblings if m.id not in (original.id, id)])}\n"
         embed.description += f"Guild: {original.guild_id} ({guild})\n"
         embed.description += f"Channel: {original.channel_id} ({channel})\n"
-        embed.description += f"Author: {original.author_id} ({author})"
+        embed.description += f"Author: {original.author_id} ({author}) ({rank})"
 
         return embed
 
