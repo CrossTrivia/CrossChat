@@ -8,6 +8,7 @@ bot.load_extensions(
     "jishaku",
     "src.cogs.core",
     "src.cogs.config",
+    "src.cogs.errors",
 )
 
 bot.run(getenv("TOKEN"))
