@@ -1,5 +1,6 @@
 from normalize import normalize
 from collections import namedtuple
+from re import sub, IGNORECASE
 
 Result = namedtuple("Result", ["message", "changed"])
 
@@ -21,14 +22,14 @@ class MessageFilter:
         return False
 
     def __call__(self, message: str) -> Result:
-        message = normalize(message).lower()
+        check = normalize(message).lower()
         changed = False
 
-        check = message.split(" ")
+        check = check.split(" ")
 
         for word in self.words:
             if word in check:
-                message.replace("word", "#"*len(word))
+                message = sub(word, "#"*len(word), message, IGNORECASE)
                 changed = True
 
         return Result(message, changed)
