@@ -5,6 +5,7 @@ from loguru import logger
 
 from src.internal.bot import Bot
 from src.utils.filter import MessageFilter
+from src.utils.ratelimiter import Ratelimiter
 
 
 class Core(commands.Cog):
@@ -14,6 +15,7 @@ class Core(commands.Cog):
         self.bot = bot
 
         self.filters = {}
+        self.limiter = Ratelimiter()
 
         self.bot.loop.run_until_complete(self.setup())
 
@@ -178,6 +180,11 @@ class Core(commands.Cog):
         embed = self.create_embed(message, badge)
 
         gc = self.channel_mapping[message.channel.id]
+
+        if msg := self.limiter.message(message.author.id, gc):
+            return await self._reject(message, f"Please wait between sending messages, try again after {msg}s")
+
+        print(msg)
 
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed)
