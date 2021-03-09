@@ -24,6 +24,8 @@ class MessageFilter:
         message = normalize(message).lower()
         changed = False
 
+        message = message.split(" ")
+
         for word in self.words:
             if word in message:
                 message.replace("word", "#"*len(word))
