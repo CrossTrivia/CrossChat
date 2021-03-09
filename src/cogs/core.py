@@ -184,8 +184,6 @@ class Core(commands.Cog):
         if msg := self.limiter.message(message.author.id, gc):
             return await self._reject(message, f"Please wait between sending messages, try again after {msg}s")
 
-        print(msg)
-
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed)
         await message.delete()
