@@ -186,7 +186,7 @@ class Core(commands.Cog):
 
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed)
-        await message.delete()
+        await message.delete(delay=0.3)  # If you remove a message too fast discord sometimes thinks it's still there
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload: RawMessageDeleteEvent):
