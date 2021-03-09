@@ -6,6 +6,7 @@ from loguru import logger
 from src.internal.bot import Bot
 from src.utils.filter import MessageFilter
 from src.utils.ratelimiter import Ratelimiter
+from src.utils.emojifix import EmojiFixer
 
 
 class Core(commands.Cog):
@@ -16,6 +17,7 @@ class Core(commands.Cog):
 
         self.filters = {}
         self.limiter = Ratelimiter()
+        self.emojifier = EmojiFixer(bot)
 
         self.bot.loop.run_until_complete(self.setup())
 
@@ -37,12 +39,13 @@ class Core(commands.Cog):
             embed.description = result.message
         return embed
 
-    @staticmethod
-    def create_embed(message: Message, badge: str) -> Embed:
+    def create_embed(self, message: Message, badge: str) -> Embed:
         tcr = 0
         for role in message.author.roles:
             if role.colour.value:
                 tcr = role.colour.value
+
+        message.content = self.emojifier.message(message.content)
 
         embed = Embed(
             description=message.content,
