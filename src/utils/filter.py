@@ -24,10 +24,10 @@ class MessageFilter:
         message = normalize(message).lower()
         changed = False
 
-        message = message.split(" ")
+        check = message.split(" ")
 
         for word in self.words:
-            if word in message:
+            if word in check:
                 message.replace("word", "#"*len(word))
                 changed = True
 
