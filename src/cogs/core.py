@@ -183,12 +183,14 @@ class Core(commands.Cog):
         embed = self.create_embed(message, badge)
 
         gc = self.channel_mapping[message.channel.id]
+        bypass = True if gc == "staff" else False
 
-        if msg := self.limiter.message(message.author.id, gc):
-            return await self._reject(message, f"Please wait between sending messages, try again after {msg}s")
+        if not bypass:
+            if msg := self.limiter.message(message.author.id, gc):
+                return await self._reject(message, f"Please wait between sending messages, try again after {msg}s")
 
         await self.bot.db.create_message(message, message.id)
-        await self.broadcast(message.id, gc, embed=embed)
+        await self.broadcast(message.id, gc, embed=embed, bypass=bypass)
         await message.delete(delay=0.3)  # If you remove a message too fast discord sometimes thinks it's still there
 
     @commands.Cog.listener()
