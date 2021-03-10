@@ -26,7 +26,7 @@ class Database:
         logger.info("Setting up database connections...")
         self.pool = await create_pool(
             host=getenv("DB_HOST", "127.0.0.1"),
-            port=getenv("DB_PORT", 5432),
+            port=int(getenv("DB_PORT", 5432)),
             database=getenv("DB_DATABASE", "crosschat"),
             user=getenv("DB_USER", "root"),
             password=getenv("DB_PASS", "password"),
