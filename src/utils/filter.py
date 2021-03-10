@@ -5,18 +5,23 @@ from re import sub, IGNORECASE
 Result = namedtuple("Result", ["message", "changed"])
 LETTERS = ["abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 
+with open("./static/words.txt") as f:
+    init_words = set([word.strip() for word in f.readlines()])
+
 
 class MessageFilter:
     def __init__(self, words: str):
-        self.words = [word.lower() for word in words]
+        self.words = set([word.lower() for word in words]) | init_words
 
     def add(self, word: str) -> bool:
         if word.lower() in self.words:
             return False
-        self.words.append(word.lower())
+        self.words.add(word.lower())
         return True
 
     def remove(self, word: str) -> bool:
+        if word.lower() in init_words:
+            return False
         if word.lower() in self.words:
             self.words.remove(word.lower())
             return True
