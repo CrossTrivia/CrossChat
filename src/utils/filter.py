@@ -2,8 +2,8 @@ from normalize import normalize
 from collections import namedtuple
 from re import sub, IGNORECASE
 
-Result = namedtuple("Result", ["message", "changed"])
-LETTERS = ["abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+Result = namedtuple("Result", ["message", "changed", "tokens"])
+LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 with open("./static/words.txt") as f:
     init_words = set([word.strip() for word in f.readlines()])
@@ -35,9 +35,12 @@ class MessageFilter:
 
         check = check.split(" ")
 
+        tokens = []
+
         for word in self.words:
             if word in check:
                 message = sub(word, "#"*len(word), message, IGNORECASE)
                 changed = True
+                tokens.append(word)
 
-        return Result(message, changed)
+        return Result(message, changed, tokens)
