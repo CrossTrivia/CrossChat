@@ -3,6 +3,7 @@ from collections import namedtuple
 from re import sub, IGNORECASE
 
 Result = namedtuple("Result", ["message", "changed"])
+LETTERS = ["abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 
 
 class MessageFilter:
@@ -24,6 +25,8 @@ class MessageFilter:
     def __call__(self, message: str) -> Result:
         check = normalize(message).lower()
         changed = False
+
+        check = "".join([l for l in check if l in LETTERS])
 
         check = check.split(" ")
 
