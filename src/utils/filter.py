@@ -4,7 +4,6 @@ from re import sub, IGNORECASE, compile
 
 Result = namedtuple("Result", ["message", "changed", "tokens"])
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-LINK = compile(r"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)")
 
 with open("./static/words.txt") as f:
     init_words = set([word.strip() for word in f.readlines()])
@@ -28,7 +27,7 @@ class MessageFilter:
             return True
         return False
 
-    def __call__(self, message: str, ignore_links: bool = False) -> Result:
+    def __call__(self, message: str) -> Result:
         check = normalize(message).lower()
         changed = False
 
@@ -43,10 +42,5 @@ class MessageFilter:
                 message = sub(word, "#" * len(word), message, IGNORECASE)
                 changed = True
                 tokens.append(word)
-
-        if not ignore_links:
-            if LINK.match(message):
-                changed = True
-                message = f"||{message}||"
 
         return Result(message, changed, tokens)
