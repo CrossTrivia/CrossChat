@@ -246,7 +246,7 @@ class Core(commands.Cog):
         """Send a broadcast announcement."""
 
         embed = Embed(
-            description=message,
+            description=f"{message}\n\nAre you a developer and want to contribute? See [the bot's repo.](https://github.com/CrossTrivia/CrossChat)",
             colour=0x87CEEB,
             timestamp=ctx.message.created_at,
         )
