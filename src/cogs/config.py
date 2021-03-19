@@ -91,7 +91,7 @@ class Config(commands.Cog):
         user = await self.bot.db.get_user(member.id)
         author = await self.bot.db.get_user(ctx.author.id)
 
-        if user >= author:
+        if user.permissions >= author.permissions:
             return await ctx.send(
                 "You can't perform this action on someone with the same as or higher permission level than you."
             )
@@ -110,7 +110,7 @@ class Config(commands.Cog):
         user = await self.bot.db.get_user(member.id)
         author = await self.bot.db.get_user(ctx.author.id)
 
-        if user >= author:
+        if user.permissions >= author.permissions:
             return await ctx.send(
                 "You can't perform this action on someone with the same as or higher permission level than you."
             )
