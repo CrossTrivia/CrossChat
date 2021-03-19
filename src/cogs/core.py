@@ -248,6 +248,7 @@ class Core(commands.Cog):
         embed = Embed(
             description=message,
             colour=0x87CEEB,
+            timestamp=ctx.message.created_at,
         )
 
         embed.set_author(
