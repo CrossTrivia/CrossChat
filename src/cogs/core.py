@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.utils import escape_mentions
 from discord import Message, TextChannel, Embed, RawMessageDeleteEvent
 from collections import defaultdict
 from loguru import logger
@@ -45,7 +46,7 @@ class Core(commands.Cog):
             if role.colour.value:
                 tcr = role.colour.value
 
-        message.content = self.emojifier.message(message.content)
+        message.content = self.emojifier.message(escape_mentions(message.content))
 
         embed = Embed(
             description=message.content,
