@@ -1,7 +1,8 @@
 from discord.ext import commands
-from discord import TextChannel, Member
+from discord import TextChannel, Member, Object
 from loguru import logger
 from os import getenv
+from typing import Union
 
 from src.internal.bot import Bot
 from src.utils.checks import level
@@ -68,7 +69,7 @@ class Config(commands.Cog):
     @commands.command(name="spl")
     @level(100)
     async def set_perm_level(
-        self, ctx: commands.Context, member: Member, level: int = 0
+        self, ctx: commands.Context, member: Union[Member, Object], level: int = 0
     ):
         """Set a user's permission level."""
 
