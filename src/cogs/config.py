@@ -4,15 +4,7 @@ from loguru import logger
 from os import getenv
 
 from src.internal.bot import Bot
-
-
-def level(l: int):
-    async def predicate(ctx: commands.Context):
-        user = await ctx.bot.db.get_user(ctx.author.id)
-
-        return user.permissions >= l
-
-    return commands.check(predicate)
+from src.utils.checks import level
 
 
 def in_guild(guild: int):

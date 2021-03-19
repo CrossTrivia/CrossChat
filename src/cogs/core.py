@@ -8,6 +8,7 @@ from src.internal.bot import Bot
 from src.utils.filter import MessageFilter
 from src.utils.ratelimiter import Ratelimiter
 from src.utils.emojifix import EmojiFixer
+from src.utils.checks import level
 
 
 class Core(commands.Cog):
@@ -238,6 +239,28 @@ class Core(commands.Cog):
         """Get info about a message."""
 
         await ctx.reply(embed=await self._msginfo(message))
+
+    @commands.command(name="announce")
+    @level(1000)
+    async def announce(self, ctx: commands.Context, channel: str, *, message: str):
+        """Send a broadcast announcement."""
+
+        embed = Embed(
+            description=message,
+            colour=0x87CEEB,
+        )
+
+        embed.set_author(
+            name="Announcement",
+            icon_url="https://cdn.discordapp.com/emojis/749062670069530655.png?v=1",
+        )
+
+        embed.set_footer(
+            icon_url="https://cdn.discordapp.com/avatars/818273503392038924/d3cf577a6351ac71fef8de92c5323cd7.png?size=2048",
+            text="Official CrossChat Announcement",
+        )
+
+        await self.broadcast(ctx.message.id, channel, embed=embed, bypass=True)
 
 
 def setup(bot: Bot):
