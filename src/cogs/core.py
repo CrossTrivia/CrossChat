@@ -59,7 +59,7 @@ class Core(commands.Cog):
         )
 
         embed.set_footer(
-            text=str(message.author.id)
+            text=str(message.author.id) + "•" + message.guild.name
         )
 
         return embed
