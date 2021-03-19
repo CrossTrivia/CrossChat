@@ -9,7 +9,10 @@ from datetime import datetime
 
 Guild = namedtuple("Guild", ["id", "config", "created_at"])
 User = namedtuple("User", ["id", "permissions", "banned", "created_at"])
-Message = namedtuple("Message", ["id", "bcid", "guild_id", "channel_id", "author_id", "content", "deleted"])
+Message = namedtuple(
+    "Message",
+    ["id", "bcid", "guild_id", "channel_id", "author_id", "content", "deleted"],
+)
 
 
 class Database:
@@ -61,13 +64,17 @@ class Database:
         return guild
 
     async def create_guild(self, guild_id: int, config: dict = {}):
-        await self.execute("INSERT INTO Guilds (id, config) VALUES ($1, $2);", guild_id, dumps(config))
+        await self.execute(
+            "INSERT INTO Guilds (id, config) VALUES ($1, $2);", guild_id, dumps(config)
+        )
         self.guilds.pop(guild_id, None)  # Shouldn't be needed, but I want to make sure
 
         return Guild(guild_id, config, datetime.utcnow())
 
     async def update_guild(self, guild_id: int, config: dict):
-        await self.execute("UPDATE Guilds SET config = $2 WHERE id = $1;", guild_id, dumps(config))
+        await self.execute(
+            "UPDATE Guilds SET config = $2 WHERE id = $1;", guild_id, dumps(config)
+        )
         self.guilds.pop(guild_id, None)  # Clear the cache
 
     async def get_all_guilds(self):
@@ -101,7 +108,9 @@ class Database:
         return User(user_id, 0, False, datetime.utcnow())
 
     async def update_user_permissions(self, user_id: int, level: int):
-        await self.execute("UPDATE Users SET permissions = $2 WHERE id = $1;", user_id, level)
+        await self.execute(
+            "UPDATE Users SET permissions = $2 WHERE id = $1;", user_id, level
+        )
         self.users.pop(user_id, None)  # Clear the cache
 
     # Message coros
@@ -114,7 +123,12 @@ class Database:
 
         await self.execute(
             "INSERT INTO Messages (id, bcid, guild_id, channel_id, author_id, content) VALUES ($1, $2, $3, $4, $5, $6);",
-            id, bcid, guild_id, channel_id, author_id, content,
+            id,
+            bcid,
+            guild_id,
+            channel_id,
+            author_id,
+            content,
         )
 
     async def get_message(self, id: int):
@@ -124,7 +138,13 @@ class Database:
             return None
 
         return Message(
-            data["id"], data["bcid"], data["guild_id"], data["channel_id"], data["author_id"], data["content"], data["deleted"]
+            data["id"],
+            data["bcid"],
+            data["guild_id"],
+            data["channel_id"],
+            data["author_id"],
+            data["content"],
+            data["deleted"],
         )
 
     async def get_messages(self, bcid: int):
@@ -132,7 +152,15 @@ class Database:
 
         ms = []
         for data in messages:
-            ms.append(Message(
-                data["id"], data["bcid"], data["guild_id"], data["channel_id"], data["author_id"], data["content"], data["deleted"]
-            ))
+            ms.append(
+                Message(
+                    data["id"],
+                    data["bcid"],
+                    data["guild_id"],
+                    data["channel_id"],
+                    data["author_id"],
+                    data["content"],
+                    data["deleted"],
+                )
+            )
         return ms

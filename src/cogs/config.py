@@ -14,6 +14,7 @@ def level(l: int):
 
     return commands.check(predicate)
 
+
 def in_guild(guild: int):
     async def predicate(ctx: commands.Context):
         return ctx.guild and ctx.guild.id == guild
@@ -58,11 +59,15 @@ class Config(commands.Cog):
 
         if "channels" not in config:
             config["channels"] = {}
-            return await ctx.reply("This channel isn't linked to any CrossChat channel.")
+            return await ctx.reply(
+                "This channel isn't linked to any CrossChat channel."
+            )
         elif str(channel.id) in config["channels"]:
             old = config["channels"].pop(str(channel.id))
         else:
-            return await ctx.reply("This channel isn't linked to any CrossChat channel.")
+            return await ctx.reply(
+                "This channel isn't linked to any CrossChat channel."
+            )
 
         await self.bot.db.update_guild(ctx.guild.id, config)
         await self.bot.cogs["Core"].setup()
@@ -70,10 +75,14 @@ class Config(commands.Cog):
 
     @commands.command(name="spl")
     @level(100)
-    async def set_perm_level(self, ctx: commands.Context, member: Member, level: int = 0):
+    async def set_perm_level(
+        self, ctx: commands.Context, member: Member, level: int = 0
+    ):
         """Set a user's permission level."""
 
-        user = await self.bot.db.get_user(member.id)  # Make sure the user exists, not perfect
+        user = await self.bot.db.get_user(
+            member.id
+        )  # Make sure the user exists, not perfect
 
         await self.bot.db.update_user_permissions(member.id, level)
         await ctx.reply(f"Successfully set permission level for {member} to {level}")
@@ -91,7 +100,9 @@ class Config(commands.Cog):
         author = await self.bot.db.get_user(ctx.author.id)
 
         if user >= author:
-            return await ctx.send("You can't perform this action on someone with the same as or higher permission level than you.")
+            return await ctx.send(
+                "You can't perform this action on someone with the same as or higher permission level than you."
+            )
 
         await self.set_perm_level(ctx, member, 10)
 
@@ -108,7 +119,9 @@ class Config(commands.Cog):
         author = await self.bot.db.get_user(ctx.author.id)
 
         if user >= author:
-            return await ctx.send("You can't perform this action on someone with the same as or higher permission level than you.")
+            return await ctx.send(
+                "You can't perform this action on someone with the same as or higher permission level than you."
+            )
 
         await self.set_perm_level(ctx, member, 0)
 

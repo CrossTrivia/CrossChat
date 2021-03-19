@@ -39,7 +39,7 @@ class MessageFilter:
 
         for word in self.words:
             if word in check:
-                message = sub(word, "#"*len(word), message, IGNORECASE)
+                message = sub(word, "#" * len(word), message, IGNORECASE)
                 changed = True
                 tokens.append(word)
 

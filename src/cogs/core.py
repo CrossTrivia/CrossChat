@@ -58,9 +58,7 @@ class Core(commands.Cog):
             icon_url=str(message.author.avatar_url),
         )
 
-        embed.set_footer(
-            text=str(message.author.id) + " • " + message.guild.name
-        )
+        embed.set_footer(text=str(message.author.id) + " • " + message.guild.name)
 
         return embed
 
@@ -86,7 +84,7 @@ class Core(commands.Cog):
 
         guilds = await self.bot.db.get_all_guilds()
         for guild in guilds:
-            channels = guild.config.get('channels', {})
+            channels = guild.config.get("channels", {})
 
             for local, glob in channels.items():
                 local = int(local)
@@ -132,13 +130,17 @@ class Core(commands.Cog):
 
         return embed
 
-    async def _reject(self, message: Message, reason: str, delete_after: int = 10, dm: bool = False):
+    async def _reject(
+        self, message: Message, reason: str, delete_after: int = 10, dm: bool = False
+    ):
         await message.delete(delay=delete_after)
         if dm:
             return await message.author.send(reason)
         await message.reply(reason, delete_after=delete_after)
 
-    async def _send(self, bcid: int, channel: TextChannel, bypass: bool = False, **kwargs):
+    async def _send(
+        self, bcid: int, channel: TextChannel, bypass: bool = False, **kwargs
+    ):
         if not bypass:
             ft = self.filters.get(channel.guild.id)
             if "embed" in kwargs and ft:
@@ -161,23 +163,34 @@ class Core(commands.Cog):
         siblings = await self._siblings(bcid)
 
         for sibling in siblings:
-            if sibling.id != bcid and sibling.id != exclude and sibling.id != sibling.bcid:
-                self.bot.loop.create_task(self._edit(sibling.channel_id, sibling.id, **kwargs))
+            if (
+                sibling.id != bcid
+                and sibling.id != exclude
+                and sibling.id != sibling.bcid
+            ):
+                self.bot.loop.create_task(
+                    self._edit(sibling.channel_id, sibling.id, **kwargs)
+                )
 
     async def broadcast(self, msgid: int, channel: str, **kwargs):
         channels = self.channels.get(channel, [])
 
         for cid in channels:
-            self.bot.loop.create_task(self._send(msgid, self.bot.get_channel(cid), **kwargs))
+            self.bot.loop.create_task(
+                self._send(msgid, self.bot.get_channel(cid), **kwargs)
+            )
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
-        if self.should_ignore(message): return
+        if self.should_ignore(message):
+            return
 
         user = await self.bot.db.get_user(message.author.id)
 
         if user.banned:
-            return await self._reject(message, "You cannot send messages as you are banned from CrossChat.")
+            return await self._reject(
+                message, "You cannot send messages as you are banned from CrossChat."
+            )
 
         badge, _ = self.get_badge(user.permissions)
         embed = self.create_embed(message, badge)
@@ -187,11 +200,16 @@ class Core(commands.Cog):
 
         if not bypass:
             if msg := self.limiter.message(message.author.id, gc):
-                return await self._reject(message, f"Please wait between sending messages, try again after {msg}s")
+                return await self._reject(
+                    message,
+                    f"Please wait between sending messages, try again after {msg}s",
+                )
 
         await self.bot.db.create_message(message, message.id)
         await self.broadcast(message.id, gc, embed=embed, bypass=bypass)
-        await message.delete(delay=0.3)  # If you remove a message too fast discord sometimes thinks it's still there
+        await message.delete(
+            delay=0.3
+        )  # If you remove a message too fast discord sometimes thinks it's still there
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload: RawMessageDeleteEvent):
@@ -204,10 +222,17 @@ class Core(commands.Cog):
             if message.id == message.bcid:
                 return
 
-            await self.massedit(payload.message_id, exclude=payload.message_id, content="Message deleted.", embed=None)
+            await self.massedit(
+                payload.message_id,
+                exclude=payload.message_id,
+                content="Message deleted.",
+                embed=None,
+            )
 
     @commands.command(name="info")
-    @commands.check_any(commands.is_owner(), commands.has_permissions(manage_messages=True))
+    @commands.check_any(
+        commands.is_owner(), commands.has_permissions(manage_messages=True)
+    )
     async def info(self, ctx: commands.Context, message: int):
         """Get info about a message."""
 

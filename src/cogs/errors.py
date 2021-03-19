@@ -47,7 +47,7 @@ class Errors(commands.Cog):
         else:
             embed = self._get_error_embed(
                 "Input error",
-                "Something about your input seems off. Check the arguments and try again."
+                "Something about your input seems off. Check the arguments and try again.",
             )
             await ctx.reply(embed=embed)
 
