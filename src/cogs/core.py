@@ -197,7 +197,7 @@ class Core(commands.Cog):
         embed = self.create_embed(message, badge)
 
         gc = self.channel_mapping[message.channel.id]
-        bypass = True if gc == "staff" else False
+        bypass = True if gc == "staff" or user.permissions >= 10 else False
 
         if not bypass:
             if msg := self.limiter.message(message.author.id, gc):
